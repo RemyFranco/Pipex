@@ -6,7 +6,7 @@
 /*   By: rfranco <rfranco@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/30 16:18:57 by rfranco           #+#    #+#             */
-/*   Updated: 2023/01/31 18:19:51 by rfranco          ###   ########.fr       */
+/*   Updated: 2023/02/10 20:27:49 by rfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,11 @@ static int	ft_wordcount(char *s)
 			count++;
 			ft_next_delimiter(&s, '\'');
 		}
+		else if (*s == '"')
+		{
+			count++;
+			ft_next_delimiter(&s, '"');
+		}
 		else if (*s != ' ')
 		{
 			count++;
@@ -58,6 +63,8 @@ static char	*ft_getword(char **s, char c)
 	char	*word;
 
 	i = 0;
+	if (**s == c)
+		(*s)++;
 	while ((*s)[i] && (*s)[i] != c)
 		i++;
 	word = (char *)ft_calloc(i + 1, sizeof(char));
@@ -87,10 +94,9 @@ char	**ft_ppxsplit(char *s)
 	while (*s)
 	{
 		if (*s == '\'')
-		{
-			s++;
 			strs[i++] = ft_getword(&s, '\'');
-		}
+		else if (*s == '"')
+			strs[i++] = ft_getword(&s, '"');
 		else if (*s != ' ')
 			strs[i++] = ft_getword(&s, ' ');
 		if (!strs[i - 1])
