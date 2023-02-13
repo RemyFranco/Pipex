@@ -1,20 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   args_parsing.c                                     :+:      :+:    :+:   */
+/*   args_parsing_bonus.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rfranco <rfranco@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/23 22:04:02 by rfranco           #+#    #+#             */
-/*   Updated: 2023/02/13 14:57:13 by rfranco          ###   ########.fr       */
+/*   Created: 2023/02/13 11:20:21 by rfranco           #+#    #+#             */
+/*   Updated: 2023/02/13 15:47:42 by rfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
+#include "pipex_bonus.h"
 
 void	args_parsing(t_pipex *ppx, int argc, char **argv, char **envp)
 {
-	if (argc != 5)
+	if (argc < 3)
 		exit_argc();
 	ppx->num_cmds = argc - 3;
 	ppx->in_fd = open(argv[1], O_RDONLY);
@@ -23,6 +23,9 @@ void	args_parsing(t_pipex *ppx, int argc, char **argv, char **envp)
 	ppx->out_fd = open(argv[argc - 1], O_WRONLY | O_TRUNC | O_CREAT, 0644);
 	if (ppx->out_fd == -1)
 		exit_error(argv[argc - 1]);
+	ppx->pid = (pid_t *)malloc(sizeof(pid_t) * ppx->num_cmds);
+	if (!ppx->pid)
+		exit_error("ERR_PID");
 	ppx->paths = get_paths(envp);
 	ppx->cmds = get_cmds(ppx->num_cmds, argv);
 }
@@ -46,11 +49,6 @@ char	**get_paths(char **envp)
 	{
 		tmp = paths[i];
 		paths[i] = ft_strjoin(paths[i], "/");
-		if (!paths[i])
-		{
-			ft_freesplit(paths);
-			return (NULL);
-		}	
 		free(tmp);
 		i++;
 	}

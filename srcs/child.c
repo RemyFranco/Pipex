@@ -6,7 +6,7 @@
 /*   By: rfranco <rfranco@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/25 15:26:39 by rfranco           #+#    #+#             */
-/*   Updated: 2023/02/08 11:41:35 by rfranco          ###   ########.fr       */
+/*   Updated: 2023/02/13 14:33:51 by rfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void	child_1(t_pipex ppx, char **envp)
 	dup2(ppx.pipe_fd[1], STDOUT_FILENO);
 	close(ppx.pipe_fd[1]);
 	execve(command, ppx.cmds[0], envp);
-	exit (127);
+	exit (2);
 }
 
 void	child_2(t_pipex ppx, char **envp)
@@ -64,5 +64,5 @@ void	child_2(t_pipex ppx, char **envp)
 	close(ppx.pipe_fd[0]);
 	close(ppx.pipe_fd[1]);
 	execve(command, ppx.cmds[1], envp);
-	exit (127);
+	exit (2);
 }

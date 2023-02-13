@@ -1,42 +1,43 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   main_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rfranco <rfranco@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/23 21:25:50 by rfranco           #+#    #+#             */
-/*   Updated: 2023/02/12 01:48: by rfranco          ###   ########.fr       */
+/*   Created: 2023/02/13 10:54:08 by rfranco           #+#    #+#             */
+/*   Updated: 2023/02/13 16:17:00 by rfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
+#include "pipex_bonus.h"
 
 int	main(int argc, char **argv, char **envp)
 {
-	t_pipex	ppx;
+	int		fork_num;
 	int		status;
+	t_pipex	ppx;
 
+	fork_num = 0;
 	status = 0;
 	args_parsing(&ppx, argc, argv, envp);
-	if (pipe(ppx.pipe_fd) == -1)
-		exit_error("Error");
-	ppx.pid1 = fork();
-	if (ppx.pid1 == -1)
-		exit_error("Error");
-	else if (ppx.pid1 == 0)
-		child_1(ppx, envp);
-	ppx.pid2 = fork();
-	if (ppx.pid2 == -1)
-		exit_error("Error");
-	else if (ppx.pid2 == 0)
-		child_2(ppx, envp);
-	close_and_free(ppx);
-	waitpid(ppx.pid1, &status, 0);
-	waitpid(ppx.pid2, &status, 0);
-	if (WEXITSTATUS(status) != 0)
-		return (WEXITSTATUS(status));
-	return (0);
+	open_pipes(&ppx, argc);
+	while (fork_num < ppx.num_cmds)
+	{
+		ppx.pid[fork_num] = fork();
+		if (ppx.pid[fork_num] == -1)
+		{
+			free_parent(ppx);
+			exit_error("Error");
+		}
+		else if (ppx.pid[fork_num] == 0)
+			child_process(ppx, fork_num, envp);
+		fork_num++;
+	}
+	close_all(ppx);
+	wait_all_pid(ppx, &status);
+	free_all(ppx);
+	return (WEXITSTATUS(status));
 }
 
 /// @brief exits the program with exit(1). Only used to handle invalid number
@@ -44,7 +45,7 @@ int	main(int argc, char **argv, char **envp)
 void	exit_argc(void)
 {
 	ft_putendl_fd("Error: Invalid number of arguments", 2);
-	ft_putendl_fd("Use format: \"infile\" \"cmd1\" \"cmd2\" \"oufile\"", 2);
+	ft_putendl_fd("Use format: <infile> <cmd1> <cmd2> <cmd...> <outfile>", 2);
 	exit (1);
 }
 
@@ -70,12 +71,10 @@ void	free_cmds(char ***cmds)
 	free(cmds);
 }
 
-void	close_and_free(t_pipex ppx)
+void	free_all(t_pipex ppx)
 {
-	close(ppx.pipe_fd[0]);
-	close(ppx.pipe_fd[1]);
-	close(ppx.in_fd);
-	close(ppx.out_fd);
+	free(ppx.pipe_fd);
+	free(ppx.pid);
 	ft_freesplit(ppx.paths);
 	free_cmds(ppx.cmds);
 }

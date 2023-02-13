@@ -6,11 +6,12 @@
 /*   By: rfranco <rfranco@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/30 16:18:57 by rfranco           #+#    #+#             */
-/*   Updated: 2023/02/13 14:06:40 by rfranco          ###   ########.fr       */
+/*   Updated: 2023/02/10 20:27:49 by rfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+#include "libft.h"
 
 /// @brief move the pointer (char *) to the next delimiter c + 1, or to '\0'.
 /// @param s a pointer to the string s.
